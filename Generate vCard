@@ -1,0 +1,41 @@
+<html>
+<body>
+<form>
+<label for="first_name">First Name:</label>
+<input type="text" id="first_name" name="first_name"><br>
+<label for="last_name">Last Name:</label>
+<input type="text" id="last_name" name="last_name"><br>
+<label for="phone_number">Phone Number:</label>
+<input type="text" id="phone_number" name="phone_number"><br>
+<label for="email">Email:</label>
+<input type="text" id="email" name="email"><br>
+<button onclick="generateVCard()">Generate vCard</button>
+</form>
+<script>
+       function generateVCard() {
+           // Get the user-provided information from the form
+           var firstName = document.getElementById("first_name").value;
+           var lastName = document.getElementById("last_name").value;
+           var phoneNumber = document.getElementById("phone_number").value;
+           var email = document.getElementById("email").value;
+
+           // Create the vCard as a string
+           var vcard = "BEGIN:VCARD\n";
+           vcard += "VERSION:4.0\n";
+           vcard += "FN:" + firstName + " " + lastName + "\n";
+           vcard += "TEL;TYPE=CELL:" + phoneNumber + "\n";
+           vcard += "EMAIL:" + email + "\n";
+           vcard += "END:VCARD";
+
+           // Create a data URI for the vCard file
+           var dataUri = "data:text/vcard;charset=utf-8," + encodeURIComponent(vcard);
+
+           // Create a link to download the vCard file
+           var link = document.createElement("a");
+           link.href = dataUri;
+           link.download = "contact.vcf";
+           link.click();
+       }
+</script>
+</body>
+</html>
