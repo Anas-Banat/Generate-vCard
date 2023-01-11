@@ -20,12 +20,7 @@
            var email = document.getElementById("email").value;
 
            // Create the vCard as a string
-           var vcard = "BEGIN:VCARD\n";
-           vcard += "VERSION:4.0\n";
-           vcard += "FN:" + firstName + " " + lastName + "\n";
-           vcard += "TEL;TYPE=CELL:" + phoneNumber + "\n";
-           vcard += "EMAIL:" + email + "\n";
-           vcard += "END:VCARD";
+           var vCard = "BEGIN:VCARD\nVERSION:4.0\nFN:" + firstName + " " + lastName + "\nTEL;TYPE=WORK,VOICE:" + phoneNumber + "\nTEL;TYPE=CELL,VOICE:123456789\nEMAIL;TYPE=PREF,INTERNET:" + email + "\nEND:VCARD";
 
            // Create a data URI for the vCard file
            var dataUri = "data:text/vcard;charset=utf-8," + encodeURIComponent(vcard);
@@ -34,7 +29,9 @@
            var link = document.createElement("a");
            link.href = dataUri;
            link.download = "contact.vcf";
+           document.body.appendChild(a);
            link.click();
+           document.body.removeChild(a);
        }
 </script>
 </body>
