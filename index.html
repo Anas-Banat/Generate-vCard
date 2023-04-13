@@ -1,38 +1,136 @@
-<html>
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title id="pageTile"></title>
+  <link rel="stylesheet" href="css/Styles.css">
+  <link rel="shortcut icon" href="images/favicon.ico">
+  <link href="https://fonts.googleapis.com/css?family=Merriweather|Montserrat|Sacramento&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" rel="stylesheet">
+
+  <link href="fontawesome/css/fontawesome.css" rel="stylesheet">
+  <link href="fontawesome/css/brands.css" rel="stylesheet">
+  <link href="fontawesome/css/solid.css" rel="stylesheet">
+  <script type="text/javascript" href="js/QR Code.js"></script>
+</head>
+
 <body>
-<form>
-<label for="first_name">First Name:</label>
-<input type="text" id="first_name" name="first_name"><br>
-<label for="last_name">Last Name:</label>
-<input type="text" id="last_name" name="last_name"><br>
-<label for="phone_number">Phone Number:</label>
-<input type="text" id="phone_number" name="phone_number"><br>
-<label for="email">Email:</label>
-<input type="text" id="email" name="email"><br>
-<button onclick="generateVCard()">Generate vCard</button>
-</form>
-<script>
-       function generateVCard() {
-           // Get the user-provided information from the form
-           var firstName = document.getElementById("first_name").value;
-           var lastName = document.getElementById("last_name").value;
-           var phoneNumber = document.getElementById("phone_number").value;
-           var email = document.getElementById("email").value;
+  <div id="cardLoading">
+    Loading Profile ... Please wait!
+    <i class="fas fa-spinner loading"></i>
+  </div>
 
-           // Create the vCard as a string
-           var vCard = "BEGIN:VCARD\nVERSION:4.0\nFN:" + firstName + " " + lastName + "\nTEL;TYPE=WORK,VOICE:" + phoneNumber + "\nTEL;TYPE=CELL,VOICE:123456789\nEMAIL;TYPE=PREF,INTERNET:" + email + "\nEND:VCARD";
+  <div id="cardBody">
+    <div class="logo">
+      <img src="images/logo.jpg" alt="PHCC" width="400px" height="180px">
+    </div>
 
-           // Create a data URI for the vCard file
-           var dataUri = "data:text/vcard;charset=utf-8," + encodeURIComponent(vcard);
+    <div class="top-container">
+      <img src="images/man.png" alt="Profile" width="200px">
+    </div>
 
-           // Create a link to download the vCard file
-           var link = document.createElement("a");
-           link.href = dataUri;
-           link.download = "contact.vcf";
-           document.body.appendChild(a);
-           link.click();
-           document.body.removeChild(a);
-       }
-</script>
+    <div class="middle-container">
+      <div class="profile">
+        <h2>Hello.</h2>
+        <h1 id="titleName"></h1>
+        <h2 id="roleName"></h2>
+      </div>
+      <hr>
+      <div class="contact-me">
+        <h2><b>Get In Touch</b></h2>
+        <div class="icons">
+          <ul class="ul">
+            <li><a id="tel" href="tel:"></a></li>
+            <li><a id="mobile" href="tel:"></a></li>
+            <li><a id="email" href="mailto:"></a></li>
+          </ul>
+        </div>
+        <h2>Click the ADD button, To save the information to your contact.</h2>
+        <button onclick="generateVCard2()" class="btn">ADD</button>
+      </div>
+    </div>
+
+    <div class="bottom-container">
+      <a class="footer-link" href="https://www.facebook.com/PrimaryHealthCareCorporation/">Facebook</a>
+      <a class="footer-link"
+        href="https://twitter.com/PHCCqatar?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor">Twitter</a>
+      <a class="footer-link" href="https://www.instagram.com/phccqatar/?hl=en">Instagram</a>
+      <a class="footer-link" href="https://www.linkedin.com/company/primary-health-care-corporation/">LinkedIn</a>
+      <a class="footer-link" href="https://www.youtube.com/channel/UCMeRbJgWPETlZN8fXwAELjg">Youtube</a>
+      <a class="footer-link" href="https://www.phcc.gov.qa/">Website</a>
+      <p class="footer">&copy; Copyright 2023. | All Rights Reserved by PHCC</p>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    // create the empty user object to update the user info
+    let userObj = {}
+
+    // gran the input in url with un parameter
+    const queryString = window.location.search;
+    const parameters = new URLSearchParams(queryString);
+    const userInputNameInUrl = parameters.get('un');
+
+    // grab the elements with ID selectors
+    let pageTitle = document.getElementById('pageTile');
+    let titleName = document.getElementById('titleName');
+    let roleName = document.getElementById('roleName');
+    let tel = document.getElementById('tel');
+    let mobile = document.getElementById('mobile');
+    let email = document.getElementById('email');
+
+    // below function will execute automatically and fetch the user info based on username input provided below
+    (function (userName) {
+      console.log('userName', userName)
+      if (!userName) {
+        document.getElementById('cardLoading').innerHTML = 'Please Provide the User Information in URL!';
+        return;
+      }
+
+      //To get the data
+      fetch(`https://prod-197.westeurope.logic.azure.com/workflows/e7715b7b5851441888347c2eb05f0fb7/triggers/manual/paths/invoke/User/${userName}?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=6w3cc4Pdh2DCGUcJ1XtKYHPd2m14pUf9Qsq7ex5I0oQ`)
+        .then(res => res.json())
+        .then(user => {
+          // assign user object to userObj variable for global access
+          userObj = user;
+
+          pageTitle.innerHTML = userObj.displayName;
+          titleName.innerHTML = `I'm ${userObj.displayName}`;
+          roleName.innerHTML = `a ${userObj.jobTitle}`;
+
+          tel.innerHTML = `☏ ${userObj.businessPhones[0]?.replace('-', '') || '00000000'}`;
+          tel.setAttribute('href', `tel:${userObj.businessPhones[0]?.replace('-', '') || '00000000'}`);
+
+          mobile.innerHTML = `✆ ${userObj.mobilePhone.replace('+974', '')}`;
+          mobile.setAttribute('href', `tel:${userObj.mobilePhone.replace('+974', '')}`);
+
+          email.innerHTML = `✉ ${userObj.mail}`;
+          email.setAttribute('href', `mailto: ${userObj.mail}`);
+
+          // display the info after rendering
+          document.getElementById('cardBody').style.display = 'block';
+          // hide the cardLoading after rendering
+          document.getElementById('cardLoading').style.display = 'none';
+        }).catch(error => {
+          console.log(error);
+          document.getElementById('cardLoading').innerHTML = 'No User Found!';
+        });
+    })(userInputNameInUrl); // here provide the user name info from scanning app 
+
+
+    function generateVCard2() {
+      // fill the below vCard information with fetched user response
+      var vCard = `BEGIN:VCARD\nVERSION: 4.0\nFN:${userObj.displayName} \nTEL; TYPE = WORK, VOICE: ${userObj.businessPhones[0]} \nTEL; TYPE = CELL, VOICE: ${userObj.mobilePhone.replace('+974', '')} \nEMAIL; TYPE = PREF, INTERNET:${userObj.mail} \nEND: VCARD`;
+      var data = "data:text/vcard;charset=utf-8," + encodeURIComponent(vCard);
+      var a = document.createElement('a');
+      a.href = data;
+      a.download = "VCard.vcf";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  </script>
 </body>
+
 </html>
